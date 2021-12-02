@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { actualizarBarbero, agregarBarbero, eliminarBarbero, obtenerBarbero, obtenerBarberos } from "../controllers/barberoController";
 import errorHandler from "../middlewares/error";
+import isAdmin from "../middlewares/validationAdmin";
 
 // Función que realiza las operaciones para administrar las rutas del barbero
 const barberoRoutes = (app) => {
@@ -13,8 +14,8 @@ const barberoRoutes = (app) => {
     router.get('/obtenerBarbero/:id', obtenerBarbero);
     router.post('/agregarBarbero', agregarBarbero);
     router.put('/actualizarBarbero/:id', actualizarBarbero);
-    router.delete('/eliminarBarbero/:id', eliminarBarbero);
-    // Usando el middleware del manejo de errores
+    router.delete('/eliminarBarbero/:id', isAdmin, eliminarBarbero);
+    // Usando el middleware del manejo de errores para todas las rutas
     router.use(errorHandler);
 }
 
