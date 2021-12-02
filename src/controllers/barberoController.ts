@@ -1,11 +1,10 @@
 //------------- CRUD BARBERO -----------------
 
 // Importando la función para ejecutar sentencias SQL
-import { response } from "express";
 import executeQuery from "../services/mysql.service";
 
 // Función para obtener todos los barberos
-const obtenerBarberos = async(req, res) => {
+const obtenerBarberos = async(req, res, next) => {
     /* Ejecutando el query y si se responde la promesa se imprime
        un json con la data */
     await executeQuery('SELECT * FROM barbero').then(response => {
@@ -18,13 +17,12 @@ const obtenerBarberos = async(req, res) => {
         res.json(data);
     }).catch(error => {
         // Si no se cumple la promesa se envía el siguiente error
-        console.error(`Error al obtener los barberos ${error}`);
-        res.status(500).send(error);
+        next(error);
     });
 };
 
 // Función para obtener un único barbero
-const obtenerBarbero = async(req, res) => {
+const obtenerBarbero = async(req, res, next) => {
     try {
         // Guardando en una variable la respuesta de la ejecución del query SQL
         const respuesta = await executeQuery(`SELECT * FROM barbero WHERE id_barbero = ${req.params.id}`);
@@ -32,13 +30,12 @@ const obtenerBarbero = async(req, res) => {
         res.send(respuesta);
     } catch (error) {
         // Si no se cumple la promesa se envía el siguiente error
-        console.error(`Error al obtener el barbero ${error}`);
-        res.status(500).send(error);
+        next(error);
     }
 };
 
 // Función para agregar un barbero a la base de datos
-const agregarBarbero = async (req, res) => {
+const agregarBarbero = async (req, res, next) => {
     // Desestructurando el body que se envía desde el frontend
     const {id, dni,nombre, apellido, direccion, telefono, correo} = req.body;
     try {
@@ -48,13 +45,12 @@ const agregarBarbero = async (req, res) => {
         res.status(201).json({ message: 'created', id: respuesta.insertId});
     } catch (error){
         // Si no se cumple la promesa se envía el siguiente error
-        console.error(`Error al obtener el barbero ${error}`);
-        res.status(500).send(error);
+        next(error);
     }
 };
 
 // Función para actualizar un barbero
-const actualizarBarbero = (req, res) => {
+const actualizarBarbero = (req, res, next) => {
     // Desestructurando el body  y el id que se pasa por parámetro que se envía desde el frontend
     const {dni,nombre, apellido, direccion, telefono, correo} = req.body;
     const {id} = req.params;
@@ -65,13 +61,12 @@ const actualizarBarbero = (req, res) => {
             res.json({ message: response.affectedRows > 0 ? 'Updated' : 'No se actualizó el registro' });
     }).catch(error => {
         // Si no se cumple la promesa se envía el siguiente error
-        console.error(`Error al obtener el barbero ${error}`);
-        res.status(500).send(error);
+        next(error);
     });
 };
 
 // Función para eliminar un barbero
-const eliminarBarbero = (req, res) => {
+const eliminarBarbero = (req, res, next) => {
     // Desestructurando el id proveniente del parámetro de la url
     const {id} = req.params;
     // Ejecutando la sentencia SQL para eliminar un barbero de la base de datos
@@ -80,8 +75,7 @@ const eliminarBarbero = (req, res) => {
         res.json({ message: response.affectedRows > 0 ? 'deleted' : 'No hay coincidencias' });
     }).catch(error => {
         // Si no se cumple la promesa se envía el siguiente error
-        console.error(`Error al obtener el barbero ${error}`);
-        res.status(500).send(error);
+        next(error);
     });
 };
 
